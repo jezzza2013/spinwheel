@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Spin Wheel (4 Options)</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+      background: #f3f4f6;
+    }
+
+    h1 {
+      margin-bottom: 20px;
+    }
+
+    .wheel-container {
+      position: relative;
+      width: 300px;
+      height: 300px;
+      margin-bottom: 30px;
+    }
+
+    /* Pointer */
+    .pointer {
+      position: absolute;
+      top: -20px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 0;
+      height: 0;
+      border-left: 15px solid transparent;
+      border-right: 15px solid transparent;
+      border-bottom: 25px solid #111827;
+      z-index: 3;
+    }
+
+    .wheel {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      border: 5px solid #e5e7eb;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transform-origin: 50% 50%;
+      transition: transform 4s cubic-bezier(0.22, 0.61, 0.36, 1);
+    }
+
+    .wheel-svg {
+      width: 100%;
+      height: 100%;
+    }
+
+    .wheel-center {
+      position: absolute;
+      width: 70px;
+      height: 70px;
+      border-radius: 50%;
+      background: #f9fafb;
+      border: 3px solid #111827;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      z-index: 2;
+      pointer-events: none;
+    }
+
+    /* LABELS */
+    .label {
+      position: absolute;
+      width: 50%;
+      text-align: center;
+      left: 50%;
+      top: 50%;
+      transform-origin: left center;
+      color: white;
+      font-weight: 600;
+      text-shadow: 0 1px 3px rgba(0,0,0,0.4);
+      z-index: 2;
+      pointer-events: none;
+    }
+
+    .label-1 { transform: rotate(45deg) translate(0, -50%); }
+    .label-2 { transform: rotate(135deg) translate(0, -50%); }
+    .label-3 { transform: rotate(225deg) translate(0, -50%); }
+    .label-4 { transform: rotate(315deg) translate(0, -50%); }
+
+    .controls {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+
+    button {
+      padding: 10px 24px;
+      border-radius: 999px;
+      border: none;
+      background: #6366f1;
+      color: white;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 8px 20px rgba(79, 70, 229, 0.4);
+    }
+
+    .result {
+      font-size: 18px;
+      font-weight: 600;
+      min-height: 24px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Spin the Wheel</h1>
+
+  <div class="wheel-container">
+    <div class="pointer"></div>
+
+    <div class="wheel" id="wheel">
+      <!-- Colored wheel -->
+      <svg class="wheel-svg" viewBox="0 0 200 200">
+        <path d="M100 100 L100 0 A100 100 0 0 1 200 100 Z" fill="#f97316"></path>
+        <path d="M100 100 L200 100 A100 100 0 0 1 100 200 Z" fill="#22c55e"></path>
+        <path d="M100 100 L100 200 A100 100 0 0 1 0 100 Z" fill="#3b82f6"></path>
+        <path d="M100 100 L0 100 A100 100 0 0 1 100 0 Z" fill="#e11d48"></path>
+      </svg>
+
+      <div class="wheel-center">SPIN</div>
+
+      <!-- Your labels -->
+      <div class="label label-1">Nono</div>
+      <div class="label label-2">Jeremī</div>
+      <div class="label label-3">AutreChoses</div>
+      <div class="label label-4">Bulot</div>
+    </div>
+  </div>
+
+  <div class="controls">
+    <button id="spinButton">SPIN</button>
+    <div class="result" id="result"></div>
+  </div>
+
+  <script>
+    var options = ["Nono", "Jeremī", "AutreChoses", "Bulot"];
+    var wheel = document.getElementById("wheel");
+    var result = document.getElementById("result");
+    var spinButton = document.getElementById("spinButton");
+
+    var spinning = false;
+    var currentRotation = 0;
+
+    spinButton.addEventListener("click", function () {
+      if (spinning) return;
+      spinning = true;
+      result.textContent = "";
+
+      var extraSpins = 4;
+      var randomAngle = Math.random() * 360;
+      var newRotation = currentRotation + extraSpins * 360 + randomAngle;
+
+      wheel.style.transform = "rotate(" + newRotation + "deg)";
+
+      setTimeout(function () {
+        currentRotation = newRotation;
+
+        var normalized = ((currentRotation % 360) + 360) % 360;
+
+        // Angle under pointer
+        var alpha = (90 - normalized + 360) % 360;
+
+        var index;
+        if (alpha >= 0 && alpha < 90) index = 0;       // Nono
+        else if (alpha >= 90 && alpha < 180) index = 1; // Jeremī
+        else if (alpha >= 180 && alpha < 270) index = 2; // AutreChoses
+        else index = 3;                                 // Bulot
+
+        result.textContent = "Result: " + options[index];
+        spinning = false;
+      }, 4000);
+    });
+  </script>
+
+</body>
+</html>
